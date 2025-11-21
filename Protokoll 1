@@ -10,25 +10,31 @@ Thema, Umfang und Umsetzbarkeit
 
 2. Ergebnisse / Entscheidungen
 
-Es wurde sich darauf geeinigt erstmal einen stehenden Zug zu versuchen, mit der Möglichkeit später auch noch eine Fahr-Funktion zu erweitern. Es wurde festgestellt, dass erstmal einiges an Recherche zu Physikalischen Grundlagen des Zuges sowie der benötigten Materialien. 
+Es wurde sich darauf geeinigt erstmal einen stehenden Zug zu versuchen, mit der Möglichkeit später auch noch eine Fahr-Funktion zu erweitern. 
+Es wurde festgestellt, dass erstmal einiges an Recherche zu physikalischen Grundlagen des Zuges sowie der benötigten Materialien gemacht werden muss. 
 
-3. Offene Punkte (Open Issues)
-Nr.	Beschreibung	Verantwortlich	Deadline
-1	…	…	…
-2	…	…	…
+Für den stehenden Zug wird eine Schiene und ein Zugmodell gebraucht. An die Schiene kommen entweder Permanentmagnete oder Metall, an den Zug kommen Elektromagnete 
+und ein Abstandssensor zur Schiene. Der Sensor reguliert dann die stärke der Elektromagneten mithilfe des Codes und einer Stromquelle, sodass der Zug schwebt. Seitlich 
+zwischen Zug und Schiene müssen ggf. Magneten die sich abstoßen um den Zug in der Mitte zu halten. 
+
+3. Offene Punkte 
+
+Es muss die Theorie recherchiert werden.
+Es ist unklar welches Material uns vor Ort zur Verfügung steht. 
+Es muss recherchiert werden was wir an Material brauchen. 
+
+Es sollte klarer sein, was wir wo dokumentieren. 
+
+
 4. Aufgaben / To-Dos
 
- Aufgabe 1 – Verantwortlich: Name
-
- Aufgabe 2 – Verantwortlich: Name
-
- Aufgabe 3 – Verantwortlich: Name
+siehe To-Dos
 
 5. Nächste Schritte
 
-Kurze Zusammenfassung, was als Nächstes ansteht
+siehe Offene Punkte 
 
 6. Nächstes Treffen
 
-Datum & Zeit: …
-Ort / Online-Link: …
+Datum & Zeit: 26.11.
+Ort : Labor
