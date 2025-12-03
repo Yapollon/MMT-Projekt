@@ -12,21 +12,18 @@ Ablauf, Umsetzung
 
 Erster Aufbau: Elaktromagnet fest und oben, Magnet soll schweben in der Mitte, darunter Sensor
 Entscheidung auf ersten Aufbau und Programmieurng über Arduino und danach dann stückweise Umbau auf Labview 
-erster Mechanischer Aufbau, Verbindung Abstandssensor zu Arduino und Computer 
+erster Mechanischer Aufbau, Verbindung Abstandssensor zu Arduino und Computer, Verbindung Elektromagnet  
 
-3. Offene Punkte 
+3. Offene Punkte / Nächste Schritte
 
-
+Abstandsvariation in Stromanpassung umrechnen 
+erstes Schweben hinbekommen 
 
 4. Aufgaben / To-Dos
 
 siehe To-Dos
 
-5. Nächste Schritte
-
-
-
-6. Nächstes Treffen
+5. Nächstes Treffen
 
 Datum & Zeit: 05.12.
 Ort : Physikhaus
