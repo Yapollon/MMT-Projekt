@@ -1,0 +1,117 @@
+#include <Wire.h>
+#include "Adafruit_VL6180X.h"
+
+Adafruit_VL6180X vl = Adafruit_VL6180X();
+
+// Variablen für die Statistik
+unsigned long letzterReport = 0; // Zeitstempel für den 1-Sekunden-Takt
+uint8_t minWert = 255;           // Startwert auf Maximum setzen
+uint8_t maxWert = 0;             // Startwert auf Minimum setzen
+unsigned long summe = 0;         // Für den Durchschnitt (Long damit es nicht überläuft)
+int anzahlMessungen = 0;         // Zähler, wie viele gültige Messungen wir haben
+
+void setup() 
+{
+  Serial.begin(115200);
+  
+  // Warten, bis die serielle Verbindung steht
+  while (!Serial) {
+    delay(1); 
+  } 
+  
+  Serial.println("Starte VL6180X...");
+  if (!vl.begin()) {
+    Serial.println("Fehler: VL6180X nicht gefunden!");
+    while (1); // Stoppt den Code hier, wenn der Sensor nicht gefunden wird
+  }
+  vl.setOffset(85);
+  Serial.println("VL6180X bereit!");
+}
+
+void loop() {
+// 1. Messen
+  uint8_t entfernung = vl.readRange();
+  uint8_t status = vl.readRangeStatus();
+
+  // 2. Daten sammeln (nur wenn kein Fehler vorliegt)
+  if (status == VL6180X_ERROR_NONE) {
+    
+    // Minimum aktualisieren
+    if (entfernung < minWert) {
+      minWert = entfernung;
+    }
+    
+    // Maximum aktualisieren
+    if (entfernung > maxWert) {
+      maxWert = entfernung;
+    }
+  } 
+  else {
+    // Fehlerbehandlung: Den Fehlercode übersetzen und ausgeben
+    Serial.print("Sensor Fehler (Code ");
+    Serial.print(status);
+    Serial.print("): ");
+    
+    switch(status) {
+      case VL6180X_ERROR_SYSERR_1: 
+        Serial.println("Systemfehler 1 (Intern)"); 
+        break;
+      case VL6180X_ERROR_SYSERR_5: 
+        Serial.println("Systemfehler 5 (Intern)"); 
+        break;
+      case VL6180X_ERROR_ECEFAIL: 
+        Serial.println("ECE Fehler (Elektronische Kalibrierung fehlgeschlagen)"); 
+        break;
+      case VL6180X_ERROR_NOCONVERGE: 
+        Serial.println("Keine Konvergenz (Zielreflektivität zu gering?)"); 
+        break;
+      case VL6180X_ERROR_RANGEIGNORE: 
+        Serial.println("Reichweite ignoriert (Signal ungültig)"); 
+        break;
+      case VL6180X_ERROR_SNR: 
+        Serial.println("Signal-Rausch-Verhältnis Fehler (Zu viel Umgebungslicht?)"); 
+        break;
+      case VL6180X_ERROR_RAWUFLOW: 
+        Serial.println("Raw Underflow (Wert zu niedrig)"); 
+        break;
+      case VL6180X_ERROR_RAWOFLOW: 
+        Serial.println("Raw Overflow (Wert zu hoch)"); 
+        break;
+      case VL6180X_ERROR_RANGEUFLOW: 
+        Serial.println("Reichweite Underflow (Objekt zu nah)"); 
+        break;
+      case VL6180X_ERROR_RANGEOFLOW: 
+        Serial.println("Reichweite Overflow (Objekt zu weit weg)"); 
+        break;
+      default: 
+        Serial.println("Unbekannter Fehler"); 
+        break;
+    }
+  }
+
+  // 3. Prüfen ob 100ms vergangen ist
+  if (millis() - letzterReport >= 100) {
+    
+    Serial.println("--- Statistik (letzte Sekunde) ---");
+    
+    if (anzahlMessungen > 0) {
+      // Durchschnitt berechnen
+      float durchschnitt = (float)summe / anzahlMessungen;
+
+      Serial.print("Min: "); Serial.print(minWert); Serial.print(" mm | ");
+      Serial.print("Max: "); Serial.print(maxWert); Serial.print(" mm | ");
+      Serial.print("Avg: "); Serial.print(durchschnitt); Serial.println(" mm");
+      Serial.print("Messungen: "); Serial.println(anzahlMessungen); // Zeigt, wie viele Samples genommen wurden
+    } else {
+      Serial.println("Keine gültigen Messwerte in dieser Sekunde.");
+    }
+    Serial.println("----------------------------------");
+
+    // 4. Variablen zurücksetzen für die nächste Sekunde
+    minWert = 255;   
+    maxWert = 0;
+    summe = 0;
+    anzahlMessungen = 0;
+    letzterReport = millis(); // Timer resetten
+  }
+}
