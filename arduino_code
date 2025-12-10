@@ -10,6 +10,8 @@ uint8_t maxWert = 0;             // Startwert auf Minimum setzen
 unsigned long summe = 0;         // Für den Durchschnitt (Long damit es nicht überläuft)
 int anzahlMessungen = 0;         // Zähler, wie viele gültige Messungen wir haben
 
+const int magnetPin = 10;
+
 void setup() 
 {
   Serial.begin(115200);
@@ -26,7 +28,9 @@ void setup()
   }
   vl.setOffset(85);
   Serial.println("VL6180X bereit!");
+  pinMode(magnetPin, OUTPUT);
 }
+
 
 void loop() {
 // 1. Messen
@@ -45,6 +49,14 @@ void loop() {
     if (entfernung > maxWert) {
       maxWert = entfernung;
     }
+    summe += entfernung;
+    anzahlMessungen++;
+
+  digitalWrite(magnetPin, HIGH); 
+
+  digitalWrite(magnetPin, LOW);
+  delay(10);
+
   } 
   else {
     // Fehlerbehandlung: Den Fehlercode übersetzen und ausgeben
@@ -92,7 +104,7 @@ void loop() {
   // 3. Prüfen ob 100ms vergangen ist
   if (millis() - letzterReport >= 100) {
     
-    Serial.println("--- Statistik (letzte Sekunde) ---");
+    Serial.println("--- Statistik (letzte 100ms) ---");
     
     if (anzahlMessungen > 0) {
       // Durchschnitt berechnen
@@ -114,4 +126,5 @@ void loop() {
     anzahlMessungen = 0;
     letzterReport = millis(); // Timer resetten
   }
+
 }
