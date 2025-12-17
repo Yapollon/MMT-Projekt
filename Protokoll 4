@@ -7,6 +7,8 @@ Protokollant:in: Luca
 1. Besprochene Themen
 
 Arduino Werte in Labview dargestellt, Geschwindigkeit Stromquelle getestet, erste Programmierungen mit Labview 
+Formattierung im Arduino-Code anpassen, Labview-Arduino Kommuniaktion
+
 
 2. Ergebnisse / Entscheidungen
 
@@ -19,10 +21,14 @@ Programmierung Spannungsanpassung an Abstandsschwankungen:
     Definieren Intervalle und ordnen eine Spannung dazu 
     tendenz mehr Spannung als zu wenig 
 
+
 4. Aufgaben / To-Dos
 
 Programmierung 
 Rechnung Spannung in abhängigkeit von Abstand 
+Hallsensor testen
+Hallsensor vergleichen mit ToF-Sensor
+PID-Controller einbauen
 
 5. Nächstes Treffen
 
