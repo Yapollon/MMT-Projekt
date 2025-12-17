@@ -1,0 +1,30 @@
+Protokoll 4 – MMT-Projekt
+
+Datum: 17.12.2025
+Teilnehmer:innen: Yassin, Momme, Luca
+Protokollant:in: Luca
+
+1. Besprochene Themen
+
+Arduino Werte in Labview dargestellt, Geschwindigkeit Stromquelle getestet, erste Programmierungen mit Labview 
+
+2. Ergebnisse / Entscheidungen
+
+Programmierung über Arduino ist fertig, auslesen des Arduino über Labview funktioniert 
+
+
+3. Offene Punkte / Nächste Schritte
+
+Programmierung Spannungsanpassung an Abstandsschwankungen:
+    Definieren Intervalle und ordnen eine Spannung dazu 
+    tendenz mehr Spannung als zu wenig 
+
+4. Aufgaben / To-Dos
+
+Programmierung 
+Rechnung Spannung in abhängigkeit von Abstand 
+
+5. Nächstes Treffen
+
+Datum & Zeit: 07.01.
+Ort : Physikhaus
