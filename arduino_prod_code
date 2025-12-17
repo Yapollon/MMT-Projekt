@@ -34,17 +34,10 @@ void printStatistics() {
   } else {
     Serial.println("No valid measurements.");
   }
-
-  // Reset variables for the next cycle
-  minDist = 255;   
-  maxDist = 0;
-  distSum = 0;
-  sampleCount = 0;
-  lastReportTime = millis(); 
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial) delay(1); 
   
   if (!vl.begin()) {
@@ -54,6 +47,8 @@ void setup() {
   
   pinMode(magnetPin, OUTPUT);
 }
+
+
 
 void loop() {
   // MEASURE
@@ -86,7 +81,14 @@ void loop() {
     digitalWrite(magnetPin, magnetState);
 
     // REPORTING
-    Serial.print(latestAverage);
+    Serial.println(latestAverage);
+
+    // Reset variables for the next cycle
+    minDist = 255;   
+    maxDist = 0;
+    distSum = 0;
+    sampleCount = 0;
+    lastReportTime = millis(); 
   }
 
 }
