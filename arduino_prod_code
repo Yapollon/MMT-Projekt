@@ -1,0 +1,92 @@
+#include <Wire.h>
+#include "Adafruit_VL6180X.h"
+
+Adafruit_VL6180X vl = Adafruit_VL6180X();
+
+// --- CONFIGURATION ---
+const int magnetPin = 10;
+const int targetDist = 85; // (Levitation Point)
+
+// --- STATISTICS VARIABLES ---
+unsigned long lastReportTime = 0; 
+uint8_t minDist = 255;
+uint8_t maxDist = 0;
+unsigned long distSum = 0;
+int sampleCount = 0;
+
+// Global variable to store the latest average calculation
+float latestAverage = 0.0; 
+// Variable to remember the magnet state
+int magnetState = LOW;
+
+
+// Function to handle printing to Serial Monitor
+void printStatistics() {
+  Serial.println("--- Statistics (last 100ms) ---");
+  
+  if (sampleCount > 0) {
+    Serial.print("Target: "); Serial.print(targetDist); Serial.print(" mm | ");
+    Serial.print("Min: "); Serial.print(minDist); Serial.print(" mm | ");
+    Serial.print("Max: "); Serial.print(maxDist); Serial.print(" mm | ");
+    Serial.print("Avg: "); Serial.print(latestAverage); Serial.print(" mm | ");
+    Serial.print("Samples: "); Serial.print(sampleCount); Serial.print(" | ");
+    Serial.print("Magnet set to: "); Serial.println(magnetState == HIGH ? "ON" : "OFF");
+  } else {
+    Serial.println("No valid measurements.");
+  }
+
+  // Reset variables for the next cycle
+  minDist = 255;   
+  maxDist = 0;
+  distSum = 0;
+  sampleCount = 0;
+  lastReportTime = millis(); 
+}
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial) delay(1); 
+  
+  if (!vl.begin()) {
+    while (1);
+  }
+  vl.setOffset(85); // Adjust offset if necessary
+  
+  pinMode(magnetPin, OUTPUT);
+}
+
+void loop() {
+  // MEASURE
+  uint8_t range = vl.readRange();
+  uint8_t status = vl.readRangeStatus();
+
+  if (status == VL6180X_ERROR_NONE) {
+
+    
+    // DATA COLLECTION
+    if (range < minDist) minDist = range;
+    if (range > maxDist) maxDist = range;
+    distSum += range;
+    sampleCount++;
+    
+  } else {
+    // Safety: If sensor fails, turn off magnet to prevent overheating
+    digitalWrite(magnetPin, LOW); 
+  }
+
+  // DECIDE MAGNET STATE BASED ON AVERAGE
+  if (millis() - lastReportTime >= 100) {
+    latestAverage = (float)distSum / sampleCount;
+
+    if (latestAverage < targetDist) {
+      magnetState = HIGH;
+    } else {
+      magnetState = LOW;
+    }
+    digitalWrite(magnetPin, magnetState);
+
+    // REPORTING
+    Serial.print(latestAverage);
+  }
+
+}
