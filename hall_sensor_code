@@ -1,0 +1,71 @@
+// Test: Hall Sensor A1326
+
+// Sensor Konfiguration
+const int hallPin = A1;
+const float sensitivity_mV_G = 2.5; // Empfindlichkeit in mV pro Gauss
+const float sensitivity_V_G = sensitivity_mV_G / 1000.0; // Umrechnung in Volt pro Gauss (0.0025)
+
+// Variablen für Min/Max
+// Wir setzen Min anfangs extrem hoch und Max extrem niedrig, damit sie sofort vom ersten echten Messwert überschrieben werden. 
+// (Arduino analog misst zwischen 0-1023)
+int currentMin = 1024; 
+int currentMax = -1;
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(hallPin, INPUT);
+  
+  Serial.println("Starte Sensor...");
+  
+  // Prescaler des ADC von 128 auf 16 setzen, damit die Abtastrate vom Arduino erhöht wird
+  ADCSRA &= ~(bit (ADPS0) | bit (ADPS1) | bit (ADPS2)); // Alle Bits erst auf 0 löschen
+  ADCSRA |= bit (ADPS2); // Nur Bit 2 setzen -> Prescaler 16
+}
+
+
+void loop() {
+  // Reset
+  long rawSum = 0;
+  unsigned long count = 0;
+  unsigned long startTime = millis();
+  currentMin = 1024;
+  currentMax = -1;
+
+  // Messen
+  while (millis() - startTime < 100) {
+    int rawValue = analogRead(hallPin);
+    rawSum += rawValue;
+    count++;
+      // Min/Max aktualisieren
+    // Diese Vergleiche kosten kaum Zeit, bremsen die Messung also fast nicht.
+    if (rawValue > currentMax) {
+      currentMax = rawValue;
+    }
+    if (rawValue < currentMin) {
+      currentMin = rawValue;
+    }
+
+  }
+
+  // In Spannung/Tesla umrechnen (5.0V Arduino)
+  float avgRaw = (float)rawSum / (float)count;
+  float voltage = avgRaw * (5.0 / 1023.0);
+  float voltageDiff = voltage - 2.50; // Nullpunkt vom Sensor liegt bei 2.5V
+  float gauss = voltageDiff / sensitivity_V_G; // in Gauss umrechnen
+  float millitesla = gauss / 10.0; // 1 Tesla entspricht 10000 Gauß
+
+
+  Serial.print(count);   // Wie oft gemessen wurde
+  Serial.print("\t");
+  Serial.print(avgRaw, 2);    // Der gemittelte Rohwert
+  Serial.print("\t");
+  Serial.print(millitesla, 3);// Das Endergebnis in mT
+  Serial.print(" mT");
+  Serial.print("\t");
+
+  // Die Differenz zeigt, wie stabil das Signal ist (oder wie stark der Magnet war)
+  int diff = currentMax - currentMin;
+  Serial.println(diff);
+  
+}
