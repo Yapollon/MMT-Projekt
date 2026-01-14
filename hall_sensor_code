@@ -5,6 +5,11 @@ const int hallPin = A1;
 const float sensitivity_mV_G = 2.5; // Empfindlichkeit in mV pro Gauss
 const float sensitivity_V_G = sensitivity_mV_G / 1000.0; // Umrechnung in Volt pro Gauss (0.0025)
 
+// Elektro-Magnet
+int magPin = 10;
+// Variable to remember the magnet state
+int magnetState = HIGH;
+
 // Variablen für Min/Max
 // Wir setzen Min anfangs extrem hoch und Max extrem niedrig, damit sie sofort vom ersten echten Messwert überschrieben werden. 
 // (Arduino analog misst zwischen 0-1023)
@@ -15,6 +20,7 @@ int currentMax = -1;
 void setup() {
   Serial.begin(9600);
   pinMode(hallPin, INPUT);
+  pinMode(magPin, OUTPUT);
   
   Serial.println("Starte Sensor...");
   
@@ -31,6 +37,7 @@ void loop() {
   unsigned long startTime = millis();
   currentMin = 1024;
   currentMax = -1;
+  digitalWrite(magPin, magnetState);
 
   // Messen
   while (millis() - startTime < 100) {
