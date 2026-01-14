@@ -1,0 +1,35 @@
+Protokoll 5 – MMT-Projekt
+
+Datum: 7.01.2026
+Teilnehmer:innen: Yassin, Momme, Luca
+Protokollant:in: Yassin
+
+1. Besprochene Themen
+
+Programmierung erwietert, Fehlerquellen entfernt
+Hallsensor getestet und erfolgreich betrieben
+
+
+2. Ergebnisse / Entscheidungen
+
+neuer Elektromagnet wird gekauft mit 12V Betriebsspannung und 50N Kraft
+Einbau und testen des neuen Aufbaus
+
+3. Offene Punkte / Nächste Schritte
+
+noch offen?
+Programmierung Spannungsanpassung an Abstandsschwankungen:
+    Definieren Intervalle und ordnen eine Spannung dazu 
+    tendenz mehr Spannung als zu wenig 
+
+
+4. Aufgaben / To-Dos
+
+Rechnung Spannung in abhängigkeit von Abstand 
+Hallsensor vergleichen mit ToF-Sensor
+PID-Controller einbauen
+
+5. Nächstes Treffen
+
+Datum & Zeit: 14.01.
+Ort : Physikhaus
