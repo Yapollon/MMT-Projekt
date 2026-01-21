@@ -1,0 +1,55 @@
+// Test: Hall Sensor A1326 - Levitation Mode
+
+// Sensor Configuration
+const int hallPin = A1;
+
+// Electro-Magnet
+const int magPin = 10;
+
+// LEVITATION SETTINGS
+// CHANGE THIS VALUE: This is the raw analog value (0-1023) 
+// where you want the object to hover.
+// If the magnet pulls the object closer, the sensor value usually goes UP (or DOWN depending on polarity).
+// Assuming proper polarity: Higher Value = Stronger Field (Closer Object)
+int levitationSetpoint = 436; 
+
+void setup() {
+  Serial.begin(115200); // Increased speed for faster debugging
+  pinMode(hallPin, INPUT);
+  pinMode(magPin, OUTPUT);
+  
+  Serial.println("Starting Levitation Control...");
+  
+  // Keep the high-speed ADC settings! This is excellent for levitation.
+  ADCSRA &= ~(bit (ADPS0) | bit (ADPS1) | bit (ADPS2)); 
+  ADCSRA |= bit (ADPS2); // Prescaler 16
+}
+
+void loop() {
+  // 1. Read the sensor immediately (No averaging loop!)
+  int rawValue = analogRead(hallPin);
+
+  // 2. The Control Logic (Bang-Bang)
+  // If the value is HIGHER than setpoint, the field is TOO STRONG (Object too close).
+  // Turn OFF the magnet to let it drop.
+  if (rawValue < levitationSetpoint) {
+    digitalWrite(magPin, LOW); 
+  } 
+  // If value is LOWER, field is TOO WEAK (Object falling).
+  // Turn ON the magnet to pull it up.
+  else {
+    digitalWrite(magPin, HIGH);
+  }
+
+  // 3. Debugging (Use sparingly, Serial prints slow down the loop!)
+  // Only print every 2000 cycles to keep the loop fast
+  static int printCounter = 0;
+  printCounter++;
+  if (printCounter > 2000) {
+     Serial.print("Raw: ");
+     Serial.print(rawValue);
+     Serial.print(" | Setpoint: ");
+     Serial.println(levitationSetpoint);
+     printCounter = 0;
+  }
+}
