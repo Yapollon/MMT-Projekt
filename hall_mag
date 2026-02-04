@@ -5,6 +5,7 @@ const int hallPin = A1;
 
 // Electro-Magnet
 const int magPin = 10;
+const int magPin2 = 11;
 
 // LEVITATION SETTINGS
 // CHANGE THIS VALUE: This is the raw analog value (0-1023) 
@@ -41,8 +42,25 @@ void loop() {
     digitalWrite(magPin, HIGH);
   }
 
+  if (Serial.available() > 0) {
+      
+      // Das gesendete Zeichen lesen
+      char befehl = Serial.read(); 
+
+      // Entscheiden was zu tun ist
+      if (befehl == '1') {
+        digitalWrite(magPin2, HIGH);
+        Serial.println("-> Magnet ist jetzt AN (HIGH)");
+      } 
+      else if (befehl == '2') {
+        digitalWrite(magPin2, LOW);
+        Serial.println("-> Magnet ist jetzt AUS (LOW)");
+      }
+    }
+
   // 3. Debugging (Use sparingly, Serial prints slow down the loop!)
   // Only print every 2000 cycles to keep the loop fast
+  /*
   static int printCounter = 0;
   printCounter++;
   if (printCounter > 2000) {
@@ -52,4 +70,5 @@ void loop() {
      Serial.println(levitationSetpoint);
      printCounter = 0;
   }
+  */
 }
