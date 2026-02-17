@@ -1,12 +1,8 @@
 #include <Wire.h>
 #include "Adafruit_VL6180X.h"
 
-Adafruit_VL6180X vl = Adafruit_VL6180X();
-
 // --- Konfiguration ---
-const int magnetPin = 10;
-const int targetDist = 85; // (Levitation Point)
-int magnetState = LOW; // Variable to remember the magnet state
+Adafruit_VL6180X vl = Adafruit_VL6180X();
 
 // --- Statistische Variablen ---
 unsigned long lastReportTime = 0; 
@@ -27,7 +23,6 @@ void printStatistics() {
     Serial.print("Max: "); Serial.print(maxDist); Serial.print(" mm | ");
     Serial.print("Avg: "); Serial.print(latestAverage); Serial.print(" mm | ");
     Serial.print("Samples: "); Serial.print(sampleCount); Serial.print(" | ");
-    Serial.print("Magnet set to: "); Serial.println(magnetState == HIGH ? "ON" : "OFF");
   } else {
     Serial.println("No valid measurements.");
   }
@@ -42,7 +37,6 @@ void setup() {
     while (1);
   }
   vl.setOffset(85); // Offset zur Kalibrierung
-  pinMode(magnetPin, OUTPUT);
 }
 
 
@@ -52,31 +46,16 @@ void loop() {
   uint8_t status = vl.readRangeStatus();
 
   if (status == VL6180X_ERROR_NONE) {
-
     // Datenauswertung
     if (range < minDist) minDist = range;
     if (range > maxDist) maxDist = range;
     distSum += range;
     sampleCount++;
-    
-  } else {
-    // Sicherheitsvorkehrung
-    // schaltet den Magnet aus falls der Sensor ausfällt
-    digitalWrite(magnetPin, LOW); 
   }
 
-  // Magnetschaltung basierend auf letztem Average
+  // Ausgabe des letzten Mittelwerts
   if (millis() - lastReportTime >= 100) {
     latestAverage = (float)distSum / sampleCount;
-
-    if (latestAverage < targetDist) {
-      magnetState = HIGH;
-    } else {
-      magnetState = LOW;
-    }
-    digitalWrite(magnetPin, magnetState);
-
-    // Ausgabe
     Serial.println(latestAverage);
 
     // Reset
