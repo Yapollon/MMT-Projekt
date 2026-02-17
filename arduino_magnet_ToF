@@ -3,24 +3,21 @@
 
 Adafruit_VL6180X vl = Adafruit_VL6180X();
 
-// --- CONFIGURATION ---
+// --- Konfiguration ---
 const int magnetPin = 10;
 const int targetDist = 85; // (Levitation Point)
+int magnetState = LOW; // Variable to remember the magnet state
 
-// --- STATISTICS VARIABLES ---
+// --- Statistische Variablen ---
 unsigned long lastReportTime = 0; 
 uint8_t minDist = 255;
 uint8_t maxDist = 0;
 unsigned long distSum = 0;
 int sampleCount = 0;
-
-// Global variable to store the latest average calculation
-float latestAverage = 0.0; 
-// Variable to remember the magnet state
-int magnetState = LOW;
+float latestAverage = 0.0;
 
 
-// Function to handle printing to Serial Monitor
+// Funktion um ermittelte Werte im seriellen Monitor auszugeben
 void printStatistics() {
   Serial.println("--- Statistics (last 100ms) ---");
   
@@ -36,6 +33,7 @@ void printStatistics() {
   }
 }
 
+// 
 void setup() {
   Serial.begin(9600);
   while (!Serial) delay(1); 
@@ -43,33 +41,31 @@ void setup() {
   if (!vl.begin()) {
     while (1);
   }
-  vl.setOffset(85); // Adjust offset if necessary
-  
+  vl.setOffset(85); // Offset zur Kalibrierung
   pinMode(magnetPin, OUTPUT);
 }
 
 
-
 void loop() {
-  // MEASURE
+  // Messung
   uint8_t range = vl.readRange();
   uint8_t status = vl.readRangeStatus();
 
   if (status == VL6180X_ERROR_NONE) {
 
-    
-    // DATA COLLECTION
+    // Datenauswertung
     if (range < minDist) minDist = range;
     if (range > maxDist) maxDist = range;
     distSum += range;
     sampleCount++;
     
   } else {
-    // Safety: If sensor fails, turn off magnet to prevent overheating
+    // Sicherheitsvorkehrung
+    // schaltet den Magnet aus falls der Sensor ausfällt
     digitalWrite(magnetPin, LOW); 
   }
 
-  // DECIDE MAGNET STATE BASED ON AVERAGE
+  // Magnetschaltung basierend auf letztem Average
   if (millis() - lastReportTime >= 100) {
     latestAverage = (float)distSum / sampleCount;
 
@@ -80,10 +76,10 @@ void loop() {
     }
     digitalWrite(magnetPin, magnetState);
 
-    // REPORTING
+    // Ausgabe
     Serial.println(latestAverage);
 
-    // Reset variables for the next cycle
+    // Reset
     minDist = 255;   
     maxDist = 0;
     distSum = 0;
