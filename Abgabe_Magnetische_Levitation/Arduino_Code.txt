@@ -1,0 +1,56 @@
+#include <Wire.h>
+#include "Adafruit_VL6180X.h"
+
+// --- Konfiguration ---
+Adafruit_VL6180X vl = Adafruit_VL6180X();
+
+// --- Globale Variablen für die Signalverarbeitung ---
+unsigned long lastReportTime = 0; 
+unsigned long distSum = 0;
+int sampleCount = 0;
+float latestAverage = 0.0;
+
+
+void setup() {
+  Serial.begin(9600); // Start der seriellen Kommunikation
+  while (!Serial) delay(1); 
+  
+  // Initialisierung des Sensors
+  if (!vl.begin()) { 
+    // Fehlerbehandlung: Bei fehlgeschlagener I2C-Verbindung blinkt die System-LED
+    while (1) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(100);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
+    }
+  }
+  // Sensor-Kalibrierung: setzt Nullpunkt Offset in mm
+  vl.setOffset(85);
+}
+
+void loop() {
+  // Datenerfassung vom VL6180X
+  uint8_t range = vl.readRange();        // Entfernung
+  uint8_t status = vl.readRangeStatus(); // Status (Fehler)
+
+  // Aufsummieren valider Messwerte
+  if (status == VL6180X_ERROR_NONE) {
+    distSum += range;
+    sampleCount++;
+  }
+
+  // Ausgabe des Mittelwerts nach 100ms (Abtastrate von ca. 10 Hz)
+  if (millis() - lastReportTime >= 100) {
+    if (sampleCount > 0) {
+      // Berechnung des arithmetischen Mittels zur Rauschunterdrückung
+      latestAverage = (float)distSum / sampleCount;
+      Serial.println(latestAverage);
+    }
+
+    // Zurücksetzen aller globalen Variablen
+    distSum = 0;
+    sampleCount = 0;
+    lastReportTime = millis(); 
+  }
+}
