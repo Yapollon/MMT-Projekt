@@ -1,0 +1,59 @@
+const int hallPin = A1;
+const int magPin = 10;
+
+int setpoint = 310; 
+float Kp = 10.0;
+float Kd = 20.0; // Startwert für Dämpfung
+int lastError = 0;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(magPin, OUTPUT);
+  
+  // Schneller ADC (Prescaler 16)
+  ADCSRA &= ~(bit(ADPS0) | bit(ADPS1) | bit(ADPS2)); 
+  ADCSRA |= bit(ADPS2); 
+  
+  Serial.println("System bereit!");
+  Serial.println("Befehle: 'p' + Zahl (z.B. p15) oder 'd' + Zahl (z.B. d40)");
+}
+
+void loop() {
+  // --- LIVE TUNING LOGIK ---
+  if (Serial.available() > 0) {
+    char type = Serial.read();    // Liest den ersten Buchstaben (p oder d)
+    int val = Serial.parseInt();  // Liest die darauf folgende Zahl
+    
+    if (type == 'p' || type == 'P') {
+      Kp = (float)val;
+      Serial.print(">>> Kp gesetzt auf: "); Serial.println(Kp);
+    } 
+    else if (type == 'd' || type == 'D') {
+      Kd = (float)val;
+      Serial.print(">>> Kd gesetzt auf: "); Serial.println(Kd);
+    }
+  }
+
+  int rawValue = analogRead(hallPin);
+  
+  // PD-Regler Logik
+  int error = rawValue - setpoint;
+  int derivative = error - lastError;
+  
+  float outputCalc = (error * Kp) + (derivative * Kd);
+  int output = constrain((int)outputCalc, 0, 255);
+  
+  analogWrite(magPin, output);
+  
+  lastError = error;
+
+  // Debugging-Ausgabe
+  static int pCount = 0;
+  if (pCount++ > 1000) {
+    Serial.print("S:"); Serial.print(rawValue);
+    Serial.print("\tPWM:"); Serial.print(output);
+    Serial.print("\tKp:"); Serial.print(Kp);
+    Serial.print("\tKd:"); Serial.println(Kd);
+    pCount = 0;
+  }
+}
